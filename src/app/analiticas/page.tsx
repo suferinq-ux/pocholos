@@ -322,7 +322,7 @@ export default function AnaliticasPage() {
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <RechartsTooltip formatter={(value: number) => `S/ ${value.toFixed(2)}`} />
+                                            <RechartsTooltip formatter={(value) => `S/ ${Number(value).toFixed(2)}`} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -335,7 +335,7 @@ export default function AnaliticasPage() {
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
                                             <XAxis type="number" tickFormatter={(val) => `S/${val}`} stroke="#64748B" />
                                             <YAxis dataKey="name" type="category" width={100} stroke="#64748B" fontSize={12} />
-                                            <RechartsTooltip cursor={{fill: '#F1F5F9'}} formatter={(value: number) => `S/ ${value.toFixed(2)}`} />
+                                            <RechartsTooltip cursor={{fill: '#F1F5F9'}} formatter={(value) => `S/ ${Number(value).toFixed(2)}`} />
                                             <Bar dataKey="ingresos" fill="#C8102E" radius={[0, 4, 4, 0]} barSize={30} />
                                         </BarChart>
                                     </ResponsiveContainer>
