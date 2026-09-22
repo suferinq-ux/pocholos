@@ -193,7 +193,9 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                         .from('ventas')
                         .update({ 
                             tipo_comprobante: 'boleta',
-                            numero_comprobante: nuevoNumeroBoleta
+                            numero_comprobante: nuevoNumeroBoleta,
+                            cliente_nombre: clienteNombre,
+                            cliente_documento: documento
                         })
                         .eq('id', orderId);
 
@@ -214,6 +216,19 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
         if (necesitaGenerarBoleta && orderId) {
             await handleGenerarBoleta();
+        } else if (!esPreCuenta && orderId) {
+            // Guardar datos aunque sea TICKET
+            await supabase
+                .from('ventas')
+                .update({ 
+                    tipo_comprobante: tipoComprobante,
+                    numero_comprobante: tipoComprobante === 'boleta' ? numeroBoleta : numeroTicket,
+                    cliente_nombre: clienteNombre,
+                    cliente_documento: documento
+                })
+                .eq('id', orderId);
+
+            setYaImpreso(true);
         } else if (!esPreCuenta) {
             setYaImpreso(true);
         }

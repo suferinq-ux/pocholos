@@ -85,6 +85,8 @@ export interface Venta {
     updated_at?: string; // Add updated_at
     tipo_comprobante?: 'ticket' | 'boleta'; // Add comprobante
     numero_comprobante?: string; // Add comprobante
+    cliente_nombre?: string; // Cliente name for boletas
+    cliente_documento?: string; // DNI/RUC for boletas
     mesas?: { numero: number } | null; // Join result
 }
 
