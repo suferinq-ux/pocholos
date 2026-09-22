@@ -214,10 +214,7 @@ export default function AnaliticasPage() {
             return;
         }
 
-        // Solo vamos a filtrar si ella quería las que tienen DNI, pero es mejor pasarle todo y que ella filtre. 
-        // O mejor aún, le filtramos las que sean boleta o tengan DNI.
-        
-        let csv = "Fecha,ID Venta,Cliente,DNI/RUC,Tipo Comprobante,Numero,Total,Metodo de Pago\n";
+        let csv = "Fecha,ID Venta,Cliente,DNI/RUC,Tipo Comprobante,Numero,Total,Metodo de Pago,Productos\n";
 
         ventas.forEach(v => {
             const fecha = new Date(v.created_at).toLocaleString('es-PE');
@@ -226,11 +223,16 @@ export default function AnaliticasPage() {
             const num = v.numero_comprobante || '';
             const total = v.total.toFixed(2);
             const pago = v.metodo_pago;
-            // Para sacar cliente y dni, si lo guardamos a nivel de venta:
             const cliente = (v as any).cliente_nombre || '';
             const dni = (v as any).cliente_documento || '';
+            
+            // Extraer productos vendidos
+            let productosInfo = '';
+            if (v.items && Array.isArray(v.items)) {
+                productosInfo = v.items.map(i => `${i.cantidad}x ${i.nombre}`).join(' | ');
+            }
 
-            csv += `"${fecha}","${id}","${cliente}","${dni}","${tipo}","${num}","${total}","${pago}"\n`;
+            csv += `"${fecha}","${id}","${cliente}","${dni}","${tipo}","${num}","${total}","${pago}","${productosInfo}"\n`;
         });
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
