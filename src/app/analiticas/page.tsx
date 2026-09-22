@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
     Calendar, TrendingUp, Search, BarChart3, PieChart as PieChartIcon,
-    DollarSign, Package, ChevronLeft, ChevronRight, X
+    DollarSign, Package, ChevronLeft, ChevronRight, X, Download
 } from 'lucide-react';
 import { obtenerVentasPorRango } from '@/lib/reportes';
 import { procesarAnaliticas, type ResumenAnaliticas, type AnaliticaProducto } from '@/lib/analiticas';
@@ -208,6 +208,42 @@ export default function AnaliticasPage() {
             }));
     }, [resumen]);
 
+    const exportarVentasCsv = () => {
+        if (ventas.length === 0) {
+            alert("No hay ventas para exportar en este rango.");
+            return;
+        }
+
+        // Solo vamos a filtrar si ella quería las que tienen DNI, pero es mejor pasarle todo y que ella filtre. 
+        // O mejor aún, le filtramos las que sean boleta o tengan DNI.
+        
+        let csv = "Fecha,ID Venta,Cliente,DNI/RUC,Tipo Comprobante,Numero,Total,Metodo de Pago\n";
+
+        ventas.forEach(v => {
+            const fecha = new Date(v.created_at).toLocaleString('es-PE');
+            const id = v.id;
+            const tipo = v.tipo_comprobante || 'TICKET';
+            const num = v.numero_comprobante || '';
+            const total = v.total.toFixed(2);
+            const pago = v.metodo_pago;
+            // Para sacar cliente y dni, si lo guardamos a nivel de venta:
+            const cliente = (v as any).cliente_nombre || '';
+            const dni = (v as any).cliente_documento || '';
+
+            csv += `"${fecha}","${id}","${cliente}","${dni}","${tipo}","${num}","${total}","${pago}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `ventas_${tipoRango === 'dia' ? format(fechaSeleccionada, 'dd-MM-yyyy') : format(fechaInicio, 'dd-MM-yyyy')}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 p-4 lg:p-8 lg:ml-64 transition-all duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -225,6 +261,13 @@ export default function AnaliticasPage() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <button
+                            onClick={exportarVentasCsv}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 border-2 border-emerald-500 text-white rounded-xl hover:bg-emerald-600 hover:border-emerald-600 transition-colors w-full sm:w-auto font-bold shadow-sm"
+                        >
+                            <Download size={20} />
+                            <span className="whitespace-nowrap">Exportar Excel</span>
+                        </button>
                         <button
                             onClick={() => setMostrarCalendario(true)}
                             className="flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl hover:border-pocholo-red hover:text-pocholo-red transition-colors w-full sm:w-auto font-medium shadow-sm"
